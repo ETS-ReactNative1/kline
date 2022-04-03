@@ -7,7 +7,8 @@ import { RadioGroup, RadioButton } from 'react-radio-buttons';
 import { Panel as ColorPickerPanel } from 'rc-color-picker';
 import Slider, { Range } from 'rc-slider';
 import 'rc-slider/assets/index.css';
-
+import {RotatingSquare} from 'react-loader-spinner';
+import {loading} from './Sketch.js';
 
 class App extends Component {
 
@@ -21,6 +22,7 @@ class App extends Component {
       color_c: '#EA00FF',
       color_d: '#00AEFF',
       bellCircles: 6,
+      loading: true,
       bgcolor: {
           h: 0,
           s: 0,
@@ -36,6 +38,12 @@ class App extends Component {
     this.colorChangeC = this.colorChangeC.bind(this);
     this.colorChangeD = this.colorChangeD.bind(this);
 
+    this.onStart = this.onStart.bind(this);
+    this.onEnd = this.onEnd.bind(this);
+  }
+
+  componentDidMount() {
+    setTimeout(() => this.setState({ loading: false}), 3000);
   }
 
   colorChangeA(obj) {
@@ -66,20 +74,39 @@ class App extends Component {
 
 
   onVariationChange(value) {
+    this.onStart();
     this.setState({
+      loading: true,
       mode: value,
     });
   }
 
   onDensityChange(value) {
+    this.onStart();
     this.setState({
+      loading: true,
       density: value,
     });
   }
 
+  onStart() {
+    this.setState({
+      loading: true
+    })
+    setTimeout(() => this.setState({ loading: false}), 5000);
+  }
+
+  onEnd() {
+    this.setState({
+      loading: false
+    })
+  }
+
   render() {
+    console.log(loading)
     return (
       <div className="App">
+       {this.state.loading && <div className="preloader"><RotatingSquare ariaLabel="rotating-square" visible={true} color="white" />Processing...</div>}
         <div className="App-settings">
           <h3>MODE:</h3>
           <RadioGroup horizontal onChange={ this.onVariationChange } value=''>
@@ -93,10 +120,13 @@ class App extends Component {
           <h3>DENSITY:</h3>
 
           <Slider onChange={ this.onDensityChange } min={5} max={8} step={1} value={this.state.density} marks={{ 5: '1',  6: '2',  7: '3',  8: '4',  }} />
-
+          <div className="bossy-link">
+          <a target="_blank" href="https://www.youtube.com/watch?v=Say8M65PRG0">..also check out Bossysuits [here]. 👩‍💼 </a>
+          <a href="https://localhost96.net">{'© by Konrad Krawczyk, ' + new Date().getFullYear()}</a>
+          </div>
       </div>
         <div className="App-content">
-          <P5Wrapper sketch={sketch} mode={this.state.mode} density={this.state.density} colora={this.state.color_a}  colorb={this.state.color_b} colorc={this.state.color_c} colord={this.state.color_d}/>
+          <P5Wrapper onEnd={this.onEnd} sketch={sketch} mode={this.state.mode} density={this.state.density} colora={this.state.color_a}/>
         </div>
       </div>
     );

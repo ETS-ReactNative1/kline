@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
-
-export default function sketch (p) {
+export let loading = false;
+export default function sketch (p, props) {
 
   let pre = {
     mode: 'orderly',
-    density: "5"
+    density: "5",
   }
 
   p.setup = function() {
@@ -208,23 +208,37 @@ export default function sketch (p) {
   }
 
   p.myCustomRedrawAccordingToNewPropsHandler = function (props) {
-      if (props.mode === 'chaotic'){
+    // props.onStart();
+      if ((pre.mode !== props.mode ) && props.mode === 'chaotic'){
         pre.mode = 'chaotic';
-        p.drawImage();
-      } else if (props.mode === 'orderly'){
+        setTimeout(() => {
+          p.drawImage(props);
+        }, 500)
+      } else if ((pre.mode !== props.mode ) && props.mode === 'orderly'){
         pre.mode = 'orderly';
-        p.drawImage();
+        setTimeout(() => {
+          p.drawImage(props);
+        }, 500)
       }
       if ( props.density !== pre.density) {
         pre.density = props.density;
-        p.drawImage();
+        setTimeout(() => {
+          p.drawImage(props);
+        }, 500)
       }
+      // props.onEnd();
   }
 
 
 
-  p.drawImage = function () {
+  p.drawImage = async function () {
 
+
+      console.log('drawImage')
+
+      p.clear();
+
+      loading = true;
 
         var increment = 0.02;
         var texture = p.noise(xoff);
@@ -290,6 +304,9 @@ export default function sketch (p) {
           }
           yoff += increment;
         }
+
+        loading = false;
+
 
   }
 };
